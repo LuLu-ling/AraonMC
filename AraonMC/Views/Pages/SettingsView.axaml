@@ -1,0 +1,132 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pages="using:AraonMC.ViewModels.Pages"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="640"
+             x:Class="AraonMC.Views.Pages.SettingsView"
+             x:DataType="pages:SettingsViewModel">
+
+    <ScrollViewer Margin="28,8,28,28" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel MaxWidth="780" HorizontalAlignment="Left" Spacing="16">
+
+            <!-- General -->
+            <Border Classes="card" Padding="20">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="General" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Language" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Launcher display language." FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+                        </StackPanel>
+                        <ComboBox Grid.Column="1" SelectedItem="{Binding Language}" MinWidth="180">
+                            <ComboBoxItem>English (US)</ComboBoxItem>
+                            <ComboBoxItem>简体中文</ComboBoxItem>
+                            <ComboBoxItem>日本語</ComboBoxItem>
+                            <ComboBoxItem>Deutsch</ComboBoxItem>
+                        </ComboBox>
+                    </Grid>
+
+                    <Border Classes="divider"/>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Keep launcher open" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Don't close the launcher after starting the game." FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="1" IsChecked="{Binding KeepLauncherOpen}"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Discord Rich Presence" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Show current activity in Discord." FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="1" IsChecked="{Binding DiscordRpc}"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Check for updates on start" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Automatically look for launcher updates." FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="1" IsChecked="{Binding CheckUpdatesOnStart}"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Java -->
+            <Border Classes="card" Padding="20">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="Java" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="Java runtime path" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBox Classes="field" Text="{Binding JavaPath}"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="JVM arguments" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBox Classes="field" Text="{Binding JavaArguments}"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="5">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <TextBlock Grid.Column="0" Text="Maximum memory" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Grid.Column="1" Text="{Binding MaxMemoryMb, StringFormat='\{0:0\} MB'}" FontSize="13"
+                                       Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Right"/>
+                        </Grid>
+                        <Slider Minimum="512" Maximum="16384" Value="{Binding MaxMemoryMb}"
+                                TickFrequency="512" IsSnapToTickEnabled="True"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="Minimum memory" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <Slider Minimum="128" Maximum="4096" Value="{Binding MinMemoryMb}"
+                                TickFrequency="128" IsSnapToTickEnabled="True"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Game -->
+            <Border Classes="card" Padding="20">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="Game" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="Game directory" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBox Classes="field" Text="{Binding GameDirectory}"/>
+                    </StackPanel>
+
+                    <Grid ColumnDefinitions="*,*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="5" Margin="0,0,16,0">
+                            <TextBlock Text="Window width" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <NumericUpDown Value="{Binding WindowWidth}" Minimum="640" Maximum="3840" Increment="40" FormatString="0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="5">
+                            <TextBlock Text="Window height" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <NumericUpDown Value="{Binding WindowHeight}" Minimum="480" Maximum="2160" Increment="40" FormatString="0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Spacing="5">
+                            <TextBlock Text="Fullscreen" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <ToggleSwitch IsChecked="{Binding Fullscreen}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- About -->
+            <Border Classes="card" Padding="20">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="About" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBlock Text="{Binding AppVersion}" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <TextBlock Text="UI prototype — backend services are stubbed." FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+                    <Button Classes="accent" Command="{Binding SaveCommand}" Padding="20,9" HorizontalAlignment="Left" Margin="0,6,0,0">
+                        <TextBlock Text="Save Settings" FontWeight="SemiBold"/>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,20 +1,178 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AraonMC.ViewModels"
+        xmlns:models="using:AraonMC.Models"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="1180" d:DesignHeight="760"
         x:Class="AraonMC.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="AraonMC">
+        Title="AraonMC"
+        Width="1180" Height="760"
+        MinWidth="1000" MinHeight="660"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource BackgroundBrush}"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
+    <Window.Resources>
+        <DataTemplate x:Key="NavItemTemplate" DataType="vm:NavItemViewModel">
+            <Button Classes="flat"
+                    Command="{Binding SelectCommand}"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    Margin="8,2">
+                <Border CornerRadius="10" Padding="14,10" Background="{Binding ItemBackground}">
+                    <StackPanel Orientation="Horizontal" Spacing="14">
+                        <Path Width="20" Height="20" Stretch="Uniform"
+                              Fill="Transparent"
+                              Stroke="{Binding ItemForeground}"
+                              StrokeThickness="1.6"
+                              Data="{Binding Icon}"/>
+                        <TextBlock Text="{Binding Label}"
+                                   FontSize="14"
+                                   FontWeight="{Binding ItemWeight}"
+                                   Foreground="{Binding ItemForeground}"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </Button>
+        </DataTemplate>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <DataTemplate x:Key="AccountSwitchItemTemplate" DataType="models:MinecraftAccount">
+            <Button Classes="flat"
+                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SwitchAccountCommand}"
+                    CommandParameter="{Binding}"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    Margin="2,2">
+                <Grid ColumnDefinitions="Auto,*,Auto" Margin="6,4">
+                    <Border Classes="avatar" Width="28" Height="28" Background="{DynamicResource AccentBrush}">
+                        <TextBlock Text="{Binding AvatarKey}" Foreground="{DynamicResource AccentForegroundBrush}"
+                                   FontWeight="Bold" FontSize="11"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="10,0,4,0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Username}" Foreground="{DynamicResource TextPrimaryBrush}" FontWeight="SemiBold"/>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Ellipse Width="7" Height="7" Fill="{DynamicResource OnlineBrush}" IsVisible="{Binding IsOnline}"/>
+                            <TextBlock Text="Offline" Foreground="{DynamicResource TextMutedBrush}" FontSize="11" IsVisible="{Binding !IsOnline}"/>
+                            <TextBlock Text="Online" Foreground="{DynamicResource OnlineBrush}" FontSize="11" IsVisible="{Binding IsOnline}"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <TextBlock Grid.Column="2" Text="Active" Foreground="{DynamicResource AccentBrush}" FontSize="11"
+                               VerticalAlignment="Center" IsVisible="{Binding IsActive}"/>
+                </Grid>
+            </Button>
+        </DataTemplate>
+    </Window.Resources>
 
+    <Grid RowDefinitions="44,*">
+
+        <!-- Titlebar -->
+        <Border x:Name="TitleBar"
+                Grid.Row="0"
+                Background="{DynamicResource SidebarBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="0,0,0,1"
+                PointerPressed="TitleBar_PointerPressed"
+                DoubleTapped="TitleBar_DoubleTapped">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="16,0" Spacing="10" VerticalAlignment="Center" IsHitTestVisible="False">
+                    <Border Width="22" Height="22" CornerRadius="6" Background="{DynamicResource AccentBrush}"/>
+                    <TextBlock Text="AraonMC" FontWeight="Bold" FontSize="14"
+                               Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text="0.1.0" FontSize="11" Margin="0,0,0,0"
+                               Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Classes="chrome" Click="Minimize_Click" ToolTip.Tip="Minimize">
+                        <Path Data="{StaticResource MinimizeIcon}"/>
+                    </Button>
+                    <Button Classes="chrome" Click="Maximize_Click" ToolTip.Tip="Maximize">
+                        <Path Data="{StaticResource MaximizeIcon}"/>
+                    </Button>
+                    <Button Classes="chrome" x:Name="closeBtn" Click="Close_Click" ToolTip.Tip="Close">
+                        <Path Data="{StaticResource CloseIcon}"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Body -->
+        <Grid Grid.Row="1" ColumnDefinitions="220,*">
+
+            <!-- Sidebar -->
+            <Border Grid.Column="0" Background="{DynamicResource SidebarBrush}">
+                <Grid RowDefinitions="*,Auto">
+                    <ScrollViewer Grid.Row="0" Padding="0,10,0,10" HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding NavItems}" ItemTemplate="{StaticResource NavItemTemplate}"/>
+                    </ScrollViewer>
+
+                    <!-- Account footer -->
+                    <Border Grid.Row="1"
+                            Padding="8"
+                            BorderBrush="{DynamicResource BorderSoftBrush}"
+                            BorderThickness="0,1,0,0">
+                        <Grid>
+                            <Button Classes="flat"
+                                    Command="{Binding ToggleAccountSwitcherCommand}"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch">
+                                <Border CornerRadius="10" Padding="10,8">
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <Border Classes="avatar" Width="34" Height="34" Background="{DynamicResource AccentBrush}">
+                                            <TextBlock Text="{Binding ActiveAccount.AvatarKey}"
+                                                       Foreground="{DynamicResource AccentForegroundBrush}"
+                                                       FontWeight="Bold" FontSize="13"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" Margin="10,0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding ActiveAccount.Username}"
+                                                       Foreground="{DynamicResource TextPrimaryBrush}"
+                                                       FontWeight="SemiBold"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <Ellipse Width="7" Height="7" Fill="{DynamicResource OnlineBrush}" IsVisible="{Binding ActiveAccount.IsOnline}" VerticalAlignment="Center"/>
+                                                <TextBlock Text="{Binding ActiveAccount.IsOnline, Converter={StaticResource BoolToStatus}}"
+                                                           Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <Path Grid.Column="2" Width="14" Height="14" Stretch="Uniform"
+                                              Fill="Transparent" Stroke="{DynamicResource TextMutedBrush}" StrokeThickness="1.5"
+                                              Data="{StaticResource ChevronDownIcon}" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+                            </Button>
+
+                            <Popup IsOpen="{Binding IsAccountSwitcherOpen, Mode=TwoWay}"
+                                   Placement="Top"
+                                   HorizontalOffset="8"
+                                   Width="240">
+                                <Border Classes="card" Padding="4" Background="{DynamicResource SurfaceBrush}">
+                                    <StackPanel>
+                                        <TextBlock Text="Switch account" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="8,6,8,4"/>
+                                        <ItemsControl ItemsSource="{Binding Accounts}" ItemTemplate="{StaticResource AccountSwitchItemTemplate}"/>
+                                    </StackPanel>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- Content -->
+            <Grid Grid.Column="1" RowDefinitions="Auto,*" Background="{DynamicResource BackgroundBrush}">
+                <Border Grid.Row="0" Padding="28,18,28,14">
+                    <TextBlock Text="{Binding CurrentPage.Title}"
+                               FontSize="26" FontWeight="Bold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                </Border>
+                <ContentControl Grid.Row="1" Content="{Binding CurrentPage}"/>
+            </Grid>
+
+        </Grid>
+    </Grid>
 </Window>

@@ -1,0 +1,110 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pages="using:AraonMC.ViewModels.Pages"
+             xmlns:models="using:AraonMC.Models"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="640"
+             x:Class="AraonMC.Views.Pages.InstancesView"
+             x:DataType="pages:InstancesViewModel">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="InstanceCardTemplate" DataType="models:GameInstance">
+            <Border Classes="card" Width="300" Margin="0,0,18,18" ClipToBounds="True">
+                <Grid RowDefinitions="92,Auto,Auto,Auto">
+                    <!-- Cover -->
+                    <Border Grid.Row="0">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                                <GradientStop Offset="0" Color="{StaticResource AccentActiveColor}"/>
+                                <GradientStop Offset="1" Color="{StaticResource AccentColor}"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Grid>
+                            <TextBlock Text="{Binding CoverKey}" FontSize="46" FontWeight="Black"
+                                       Foreground="{DynamicResource AccentForegroundBrush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.55"/>
+                            <TextBlock Text="{Binding Group}" FontSize="10" FontWeight="Bold"
+                                       Foreground="{DynamicResource AccentForegroundBrush}" Opacity="0.8"
+                                       HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,12,0"/>
+                        </Grid>
+                    </Border>
+
+                    <StackPanel Grid.Row="1" Margin="16,14,16,2">
+                        <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
+                            <TextBlock Text="{Binding MinecraftVersion}" FontSize="12"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock Text="·" Foreground="{DynamicResource TextMutedBrush}"/>
+                            <TextBlock Text="{Binding DisplayLoader}" FontSize="12"
+                                       Foreground="{DynamicResource TextMutedBrush}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Margin="16,8,16,0">
+                        <TextBlock Text="LAST PLAYED" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
+                        <TextBlock Text="{Binding LastPlayed}" FontSize="12" Margin="0,2,0,0"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="3" Margin="16,12,16,16" Orientation="Horizontal" Spacing="8">
+                        <Button Classes="accent" Padding="16,8"
+                                Command="{Binding $parent[UserControl].((pages:InstancesViewModel)DataContext).PlayCommand}"
+                                CommandParameter="{Binding}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Path Width="13" Height="13" Stretch="Uniform"
+                                      Fill="{DynamicResource AccentForegroundBrush}" Stroke="Transparent"
+                                      Data="{StaticResource PlayIcon}"/>
+                                <TextBlock Text="Play" FontWeight="Bold" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <TextBlock Text="{Binding PlayTime}" FontSize="11"
+                                   Foreground="{DynamicResource TextMutedBrush}"
+                                   VerticalAlignment="Center" Margin="6,0,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid Margin="28,8,28,28" RowDefinitions="Auto,*">
+        <!-- Toolbar -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,18">
+            <Border Grid.Column="0" Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                    CornerRadius="8" Width="340" Height="36">
+                <Grid ColumnDefinitions="Auto,*">
+                    <Path Grid.Column="0" Width="16" Height="16" Margin="10,0" Stretch="Uniform"
+                          Fill="Transparent" Stroke="{DynamicResource TextMutedBrush}" StrokeThickness="1.5"
+                          Data="{StaticResource SearchIcon}"/>
+                    <TextBox Grid.Column="1" Text="{Binding SearchText}"
+                             Watermark="Search instances..."
+                             Background="Transparent" BorderThickness="0"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             CaretBrush="{DynamicResource AccentBrush}"
+                             VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+            <Button Grid.Column="2" Classes="accent" Command="{Binding NewCommand}" Padding="16,9">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Path Width="14" Height="14" Stretch="Uniform"
+                          Fill="{DynamicResource AccentForegroundBrush}" Stroke="Transparent"
+                          Data="{StaticResource PlusIcon}"/>
+                    <TextBlock Text="New Instance" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- Grid of instances -->
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl ItemsSource="{Binding Items}" ItemTemplate="{StaticResource InstanceCardTemplate}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

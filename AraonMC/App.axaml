@@ -2,14 +2,25 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="AraonMC.App"
              xmlns:local="using:AraonMC"
-             RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+             xmlns:conv="using:AraonMC.Converters"
+             RequestedThemeVariant="Dark">
 
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
-  
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://AraonMC/Styles/Colors.axaml"/>
+                <ResourceInclude Source="avares://AraonMC/Styles/Icons.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <conv:BoolToStatusConverter x:Key="BoolToStatus"/>
+        </ResourceDictionary>
+    </Application.Resources>
+
     <Application.Styles>
-        <FluentTheme />
+        <FluentTheme/>
+        <StyleInclude Source="avares://AraonMC/Styles/Controls.axaml"/>
     </Application.Styles>
 </Application>

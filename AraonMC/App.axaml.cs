@@ -4,6 +4,8 @@ using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
+using AraonMC.Services;
+using AraonMC.Services.Impl;
 using AraonMC.ViewModels;
 using AraonMC.Views;
 
@@ -20,12 +22,20 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
+            // Avoid duplicate validations from both Avalonia and the CommunityToolkit.
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
+
+            // Compose stub backend services. Real implementations replace these later.
+            var accounts = new StubAccountService();
+            var instances = new StubInstanceRepository();
+            var versions = new StubVersionRepository();
+            var mods = new StubModRepository();
+            var launcher = new StubGameLauncher();
+
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(),
+                DataContext = new MainWindowViewModel(accounts, instances, versions, mods, launcher),
             };
         }
 
