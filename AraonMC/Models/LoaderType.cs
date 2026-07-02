@@ -1,0 +1,13 @@
+namespace AraonMC.Models;
+
+/// <summary>
+/// Mod loader / game flavor of an instance.
+/// </summary>
+public enum LoaderType
+{
+    Vanilla,
+    Forge,
+    NeoForge,
+    Fabric,
+    Quilt,
+}
