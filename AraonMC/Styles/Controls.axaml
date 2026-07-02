@@ -1,0 +1,119 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Primary amber button (PLAY / confirm) -->
+    <Style Selector="Button.accent">
+        <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource AccentForegroundBrush}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="20,10"/>
+    </Style>
+    <Style Selector="Button.accent:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource AccentHoverBrush}"/>
+    </Style>
+    <Style Selector="Button.accent:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource AccentActiveBrush}"/>
+    </Style>
+
+    <!-- Subtle / secondary button -->
+    <Style Selector="Button.subtle">
+        <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="16,9"/>
+    </Style>
+    <Style Selector="Button.subtle:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource BorderBrush}"/>
+    </Style>
+
+    <!-- Danger button -->
+    <Style Selector="Button.danger">
+        <Setter Property="Background" Value="{StaticResource DangerBrush}"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="16,9"/>
+    </Style>
+    <Style Selector="Button.danger:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource DangerHoverBrush}"/>
+    </Style>
+
+    <!-- Flat: transparent, used for nav items / cards; only hover shows a tint -->
+    <Style Selector="Button.flat">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+    </Style>
+    <Style Selector="Button.flat:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+        <Setter Property="CornerRadius" Value="10"/>
+    </Style>
+
+    <!-- Chrome window buttons -->
+    <Style Selector="Button.chrome">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Width" Value="46"/>
+        <Setter Property="Height" Value="32"/>
+    </Style>
+    <Style Selector="Button.chrome Path">
+        <Setter Property="Stroke" Value="{StaticResource TextSecondaryBrush}"/>
+        <Setter Property="StrokeThickness" Value="1.5"/>
+        <Setter Property="Fill" Value="Transparent"/>
+        <Setter Property="Width" Value="14"/>
+        <Setter Property="Height" Value="14"/>
+        <Setter Property="Stretch" Value="Uniform"/>
+    </Style>
+    <Style Selector="Button.chrome:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+    </Style>
+    <Style Selector="Button.chrome#closeBtn:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource DangerBrush}"/>
+    </Style>
+    <Style Selector="Button.chrome#closeBtn:pointerover Path">
+        <Setter Property="Stroke" Value="White"/>
+    </Style>
+
+    <!-- Text field -->
+    <Style Selector="TextBox.field">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="CaretBrush" Value="{StaticResource AccentBrush}"/>
+        <Setter Property="Padding" Value="10,7"/>
+    </Style>
+    <Style Selector="TextBox.field:focus /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+    </Style>
+
+    <!-- Cards / surfaces -->
+    <Style Selector="Border.card">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderSoftBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="{StaticResource LargeCornerRadius}"/>
+    </Style>
+    <Style Selector="Border.divider">
+        <Setter Property="Background" Value="{StaticResource BorderSoftBrush}"/>
+        <Setter Property="Height" Value="1"/>
+    </Style>
+
+    <!-- Avatar circle -->
+    <Style Selector="Border.avatar">
+        <Setter Property="CornerRadius" Value="999"/>
+        <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Slim scrollbars -->
+    <Style Selector="ScrollBar.vertical">
+        <Setter Property="Width" Value="10"/>
+    </Style>
+    <Style Selector="ScrollBar.horizontal">
+        <Setter Property="Height" Value="10"/>
+    </Style>
+
+</Styles>
