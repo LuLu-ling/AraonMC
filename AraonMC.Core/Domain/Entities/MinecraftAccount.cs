@@ -1,16 +1,46 @@
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using AraonMC.Core.Domain.Enums;
+
 namespace AraonMC.Core.Domain.Entities;
 
 /// <summary>
-/// A login identity (Microsoft online or offline profile).
+/// Login identity (Microsoft / third-party / offline) — frontend-display DTO. Display fields only;
+/// secrets live in <see cref="StoredAccount"/>.
 /// </summary>
-public sealed class MinecraftAccount
+public sealed class MinecraftAccount : INotifyPropertyChanged
 {
-    public string Id { get; set; } = string.Empty;
-    public string Username { get; set; } = string.Empty;
-    public string Uuid { get; set; } = string.Empty;
-    public bool IsOnline { get; set; }
-    public bool IsActive { get; set; }
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    /// <summary>Avatar key/initial used by the UI; no real skin fetch in this build.</summary>
-    public string AvatarKey { get; set; } = string.Empty;
+    private string _uuid = "";
+    private string _username = "";
+    private AccountType _accountType;
+    private bool _isOnline;
+    private bool _isActive;
+    private string _avatarKey = "";
+    private string _serverUrl = "";
+
+    /// <summary>Stable account key (also the <c>active_account_id</c> config value).</summary>
+    public string Uuid { get => _uuid; set => Set(ref _uuid, value); }
+
+    public string Username { get => _username; set => Set(ref _username, value); }
+
+    public AccountType AccountType { get => _accountType; set => Set(ref _accountType, value); }
+
+    /// <summary>True for server-backed accounts (Microsoft / ThirdParty); false for Offline.</summary>
+    public bool IsOnline { get => _isOnline; set => Set(ref _isOnline, value); }
+
+    public bool IsActive { get => _isActive; set => Set(ref _isActive, value); }
+
+    public string AvatarKey { get => _avatarKey; set => Set(ref _avatarKey, value); }
+
+    /// <summary>ThirdParty auth-server base URL (shown as a label); empty otherwise.</summary>
+    public string ServerUrl { get => _serverUrl; set => Set(ref _serverUrl, value); }
+
+    private void Set<T>(ref T field, T value, [CallerMemberName] string? name = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return;
+        field = value;
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
 }

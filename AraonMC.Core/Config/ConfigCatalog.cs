@@ -37,6 +37,18 @@ public partial class Config
     }
 
     /// <summary>
+    /// Account-related global settings. Only scalars live here — the actual account records
+    /// (with refresh tokens) are persisted by the dedicated <c>IAccountStore</c>, since they are
+    /// a collection of secret-bearing rows outside this catalog's scalar scope.
+    /// </summary>
+    [Section(Scope = ConfigScope.Global, Path = "accounts")]
+    public sealed partial class AccountSection
+    {
+        /// <summary>UUID of the active account, or empty if none is active.</summary>
+        [Key(Default = "")] public partial string ActiveAccountId { get; set; }
+    }
+
+    /// <summary>
     /// Per-instance overrides keyed by each <see cref="Domain.Entities.MinecraftInstance"/>'s
     /// absolute path. A <c>null</c> value means "inherit the global default".
     /// </summary>
