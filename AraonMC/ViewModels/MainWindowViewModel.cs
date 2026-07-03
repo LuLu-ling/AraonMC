@@ -12,6 +12,8 @@ namespace AraonMC.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
+    private readonly IAccountService _accounts;
+
     public MainWindowViewModel(
         IAccountService accounts,
         IInstanceRepository instances,
@@ -20,10 +22,11 @@ public partial class MainWindowViewModel : ViewModelBase
         IGameLauncher launcher,
         INotificationService notifications)
     {
+        _accounts = accounts;
         var home = new HomeViewModel(launcher, instances, accounts);
         var instancesPage = new InstancesViewModel(instances, launcher, accounts);
         var modsPage = new ModsViewModel(mods);
-        var accountsPage = new AccountsViewModel(accounts);
+        var accountsPage = new AccountsViewModel(accounts, notifications);
         var settings = new SettingsViewModel(notifications);
 
         NavItems =
@@ -35,7 +38,8 @@ public partial class MainWindowViewModel : ViewModelBase
             new NavItemViewModel(this, "GearIcon", "Settings", settings),
         ];
 
-        Accounts = new ObservableCollection<MinecraftAccount>(accounts.GetAccounts());
+        // Share the service-owned live list so account add/remove stays in sync with this switcher.
+        Accounts = accounts.Accounts;
         ActiveAccount = accounts.GetActive();
 
         Navigate(NavItems[0]);
@@ -58,10 +62,10 @@ public partial class MainWindowViewModel : ViewModelBase
     private void ToggleAccountSwitcher() => IsAccountSwitcherOpen = !IsAccountSwitcherOpen;
 
     [RelayCommand]
-    private void SwitchAccount(MinecraftAccount? account)
+    private async Task SwitchAccount(MinecraftAccount? account)
     {
         if (account is null) return;
-        foreach (var a in Accounts) a.IsActive = a == account;
+        await _accounts.SetActiveAsync(account);
         ActiveAccount = account;
         IsAccountSwitcherOpen = false;
     }

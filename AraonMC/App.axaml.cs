@@ -4,10 +4,18 @@ using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
+using AraonMC.Accounts;
+using AraonMC.Auth;
+using AraonMC.Core.Application.Notifications;
+using AraonMC.Core.Config;
 using AraonMC.Core.Infrastructure.Stub;
 using AraonMC.Notifications;
 using AraonMC.ViewModels;
 using AraonMC.Views;
+// Alias (non-clashing name): the app's Config/ folder exposes namespace AraonMC.Config, which
+// would shadow the bare name `Config` over the generated facade.
+using CoreConfig = AraonMC.Core.Config.Config;
+using TomlConfigStore = AraonMC.Config.TomlConfigStore;
 
 namespace AraonMC;
 
@@ -26,13 +34,29 @@ public partial class App : Application
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
 
-            // Compose stub backend services. Real implementations replace these later.
-            var accounts = new StubAccountService();
+            var notifications = new NotificationService();
+
+            CoreConfig.Initialize(new TomlConfigStore(
+                ConfigPaths.GlobalConfigFile(),
+                ConfigPaths.InstancesConfigFile(),
+                onWarning: msg => _ = notifications.ShowAsync(NotificationRequest.Toast(
+                    "Config file reset", msg, NotificationLevel.Warning))));
+
+            var deviceCodeUi = new AvaloniaDeviceCodeUI();
+            var authenticator = new MinecraftAuthenticator(new MinecraftAuthOptions
+            {
+                ClientId = Secrets.MsOAuthClientId,
+                DeviceCodeUI = deviceCodeUi,
+                AccessTokenCacheTtl = null, // multi-account would otherwise cross-contaminate
+                Logger = DebugLog.Info,
+            });
+            var accountStore = new JsonAccountStore(notifications);
+            var accounts = new AccountService(authenticator, deviceCodeUi, accountStore);
+
             var instances = new StubInstanceRepository();
             var versions = new StubVersionRepository();
             var mods = new StubModRepository();
             var launcher = new StubGameLauncher();
-            var notifications = new NotificationService();
 
             desktop.MainWindow = new MainWindow
             {
