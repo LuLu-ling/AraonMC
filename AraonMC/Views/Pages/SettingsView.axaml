@@ -116,6 +116,25 @@
                 </StackPanel>
             </Border>
 
+            <!-- Notifications (demo of the popup system) -->
+            <Border Classes="card" Padding="20">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Notifications" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBlock Text="Try the notification system: blocking dialogs queue one-by-one, non-blocking toasts open their own window." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap"/>
+                    <WrapPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <Button Classes="subtle" Command="{Binding ShowBlockingCommand}" Margin="0,0,8,0" Padding="16,9">
+                            <TextBlock Text="Blocking dialog" FontWeight="SemiBold"/>
+                        </Button>
+                        <Button Classes="subtle" Command="{Binding ShowToastCommand}" Margin="0,0,8,0" Padding="16,9">
+                            <TextBlock Text="Non-blocking toast" FontWeight="SemiBold"/>
+                        </Button>
+                        <Button Classes="subtle" Command="{Binding ShowQueueCommand}" Padding="16,9">
+                            <TextBlock Text="Queue 3 (blocking)" FontWeight="SemiBold"/>
+                        </Button>
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+
             <!-- About -->
             <Border Classes="card" Padding="20">
                 <StackPanel Spacing="10">

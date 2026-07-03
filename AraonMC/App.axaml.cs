@@ -32,10 +32,11 @@ public partial class App : Application
             var versions = new StubVersionRepository();
             var mods = new StubModRepository();
             var launcher = new StubGameLauncher();
+            var notifications = new NotificationService();
 
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(accounts, instances, versions, mods, launcher),
+                DataContext = new MainWindowViewModel(accounts, instances, versions, mods, launcher, notifications),
             };
         }
 

@@ -15,13 +15,14 @@ public partial class MainWindowViewModel : ViewModelBase
         IInstanceRepository instances,
         IVersionRepository versions,
         IModRepository mods,
-        IGameLauncher launcher)
+        IGameLauncher launcher,
+        INotificationService notifications)
     {
         var home = new HomeViewModel(launcher, instances, accounts);
         var instancesPage = new InstancesViewModel(instances, launcher, accounts);
         var modsPage = new ModsViewModel(mods);
         var accountsPage = new AccountsViewModel(accounts);
-        var settings = new SettingsViewModel();
+        var settings = new SettingsViewModel(notifications);
 
         NavItems =
         [

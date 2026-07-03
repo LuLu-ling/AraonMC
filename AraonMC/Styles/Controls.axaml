@@ -49,6 +49,18 @@
         <Setter Property="CornerRadius" Value="10"/>
     </Style>
 
+    <!-- Square icon button (e.g. notification close). Transparent, circular hover, no shadow. -->
+    <Style Selector="Button.icon">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="CornerRadius" Value="14"/>
+    </Style>
+    <Style Selector="Button.icon:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+        <Setter Property="CornerRadius" Value="14"/>
+    </Style>
+
     <!-- Chrome window buttons -->
     <Style Selector="Button.chrome">
         <Setter Property="Background" Value="Transparent"/>

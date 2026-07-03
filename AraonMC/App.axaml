@@ -16,6 +16,7 @@
                 <ResourceInclude Source="avares://AraonMC/Styles/Icons.axaml"/>
             </ResourceDictionary.MergedDictionaries>
             <conv:BoolToStatusConverter x:Key="BoolToStatus"/>
+            <conv:NotificationLevelConverter x:Key="NotificationLevel"/>
         </ResourceDictionary>
     </Application.Resources>
 

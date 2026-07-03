@@ -27,6 +27,12 @@
     <Color x:Key="DangerColor">#EF4444</Color>
     <Color x:Key="DangerHoverColor">#DC2626</Color>
 
+    <!-- Notification levels -->
+    <Color x:Key="InfoColor">#3B82F6</Color>
+    <Color x:Key="SuccessColor">#4ADE80</Color>
+    <Color x:Key="WarningColor">#F59E0B</Color>
+    <Color x:Key="ErrorColor">#EF4444</Color>
+
     <!-- Corner radii (consumed by Fluent control templates + cards) -->
     <CornerRadius x:Key="ControlCornerRadius">8</CornerRadius>
     <CornerRadius x:Key="LargeCornerRadius">12</CornerRadius>
@@ -53,5 +59,10 @@
     <SolidColorBrush x:Key="OnlineBrush" Color="{StaticResource OnlineColor}"/>
     <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}"/>
     <SolidColorBrush x:Key="DangerHoverBrush" Color="{StaticResource DangerHoverColor}"/>
+
+    <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource InfoColor}"/>
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}"/>
+    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}"/>
 
 </ResourceDictionary>

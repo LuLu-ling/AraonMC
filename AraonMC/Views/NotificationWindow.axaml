@@ -1,0 +1,90 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AraonMC.ViewModels"
+        x:Class="AraonMC.Views.NotificationWindow"
+        x:DataType="vm:NotificationWindowViewModel"
+        Title="Notification"
+        Width="380"
+        SizeToContent="Height"
+        MinHeight="92"
+        CanResize="False"
+        ShowInTaskbar="False"
+        ShowActivated="True"
+        Background="Transparent"
+        TransparencyBackgroundFallback="#FF252538"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1"
+        WindowStartupLocation="Manual">
+
+    <!-- Rounded card filling the window. Transparent window background lets the rounded
+         corner cutouts show through; the 1px border defines the edge (no drop shadow, so
+         no transparent halo around the dialog). -->
+    <Border CornerRadius="14"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="1"
+            ClipToBounds="True"
+            PointerPressed="Header_PointerPressed">
+
+        <Grid RowDefinitions="Auto,Auto,Auto">
+
+            <!-- Header: icon + title + dismiss -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource SidebarBrush}"
+                    Padding="18,13">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Border Grid.Column="0" Width="30" Height="30" CornerRadius="15"
+                            Background="{Binding Level, Converter={StaticResource NotificationLevel}}">
+                        <TextBlock Text="{Binding Level, Converter={StaticResource NotificationLevel}, ConverterParameter=Glyph}"
+                                   Foreground="White"
+                                   FontWeight="Bold"
+                                   FontSize="15"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding Title}"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               Margin="12,0,0,0"
+                               VerticalAlignment="Center"/>
+                    <Button Grid.Column="2"
+                            Classes="icon"
+                            Width="28" Height="28"
+                            VerticalAlignment="Center"
+                            ToolTip.Tip="Dismiss"
+                            Click="Close_Click">
+                        <Path Width="12" Height="12" Stretch="Uniform"
+                              Data="{StaticResource CloseIcon}"
+                              Stroke="{DynamicResource TextMutedBrush}"
+                              StrokeThickness="1.8"
+                              Fill="Transparent"/>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Body: optional message -->
+            <Border Grid.Row="1"
+                    Background="{DynamicResource SurfaceBrush}"
+                    Padding="18,14"
+                    IsVisible="{Binding HasMessage}">
+                <TextBlock Text="{Binding Message}"
+                           TextWrapping="Wrap"
+                           FontSize="13"
+                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+            </Border>
+
+            <!-- Footer: acknowledge -->
+            <Border Grid.Row="2"
+                    Background="{DynamicResource SurfaceBrush}"
+                    Padding="18,0,14,14"
+                    HorizontalAlignment="Right">
+                <Button Classes="accent" Click="Close_Click" MinWidth="96" HorizontalAlignment="Right">
+                    <TextBlock Text="Dismiss" FontWeight="SemiBold"/>
+                </Button>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
