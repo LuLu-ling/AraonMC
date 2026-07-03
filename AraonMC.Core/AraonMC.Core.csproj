@@ -5,6 +5,12 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>AraonMC.Core</RootNamespace>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Source generator: turns [ConfigCatalog] into the typed Config facade. -->
+        <ProjectReference Include="..\AraonMC.SourceGenerators\AraonMC.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    </ItemGroup>
 
 </Project>
