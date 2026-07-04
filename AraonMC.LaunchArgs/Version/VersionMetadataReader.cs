@@ -55,6 +55,9 @@ public static class VersionMetadataReader
         if (o["logging"]?["client"] is JsonObject lc)
             meta.Logging = ParseLogging(lc);
 
+        if (o["downloads"]?["client"] is JsonObject clientObj)
+            meta.Downloads = new VersionDownloads { Client = ParseArtifact(clientObj) };
+
         return meta;
     }
 

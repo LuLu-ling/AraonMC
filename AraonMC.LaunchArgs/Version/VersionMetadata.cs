@@ -23,6 +23,9 @@ public sealed class VersionMetadata
     public IReadOnlyList<VersionLibrary> Libraries { get; set; } = [];
     public VersionLogging? Logging { get; set; }
 
+    /// <summary>顶层 downloads（client/server 制品）。</summary>
+    public VersionDownloads? Downloads { get; set; }
+
     /// <summary>父版本 id（模组版本继承原版）；合并后为 null。</summary>
     public string? InheritsFrom { get; set; }
 }
@@ -57,4 +60,9 @@ public sealed class VersionLoggingFile
 
     /// <summary>JVM 参数模板，如 <c>-Dlog4j.configurationFile=${path}</c>。</summary>
     public string? Argument { get; set; }
+}
+
+public sealed class VersionDownloads
+{
+    public VersionArtifact? Client { get; set; }
 }
