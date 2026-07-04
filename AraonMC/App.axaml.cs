@@ -2,8 +2,11 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
+using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform.Storage;
 using AraonMC.Accounts;
 using AraonMC.Auth;
 using AraonMC.Core.Application.Notifications;
@@ -70,10 +73,15 @@ public partial class App : Application
             var launcher = new StubGameLauncher();
             var downloads = new DownloadManager(installer, notifications);
 
-            desktop.MainWindow = new MainWindow
+            var window = new MainWindow();
+            Func<Task<string?>> pickFolder = async () =>
             {
-                DataContext = new MainWindowViewModel(accounts, instances, versions, downloads, mods, launcher, notifications),
+                var result = await window.StorageProvider.OpenFolderPickerAsync(
+                    new FolderPickerOpenOptions { Title = "Select .minecraft folder" });
+                return result.Count > 0 ? result[0].Path.LocalPath : null;
             };
+            window.DataContext = new MainWindowViewModel(accounts, instances, versions, downloads, mods, launcher, notifications, pickFolder);
+            desktop.MainWindow = window;
         }
 
         base.OnFrameworkInitializationCompleted();

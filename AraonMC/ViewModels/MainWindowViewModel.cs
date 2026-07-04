@@ -27,7 +27,8 @@ public partial class MainWindowViewModel : ViewModelBase
         IDownloadManager downloads,
         IModRepository mods,
         IGameLauncher launcher,
-        INotificationService notifications)
+        INotificationService notifications,
+        Func<Task<string?>> pickFolder)
     {
         _accounts = accounts;
         var home = new HomeViewModel(launcher, instances, accounts);
@@ -36,7 +37,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _versionSelectPage = new VersionSelectViewModel(versions, instances, downloads, NavigateToDownloads);
         var modsPage = new ModsViewModel(mods);
         var accountsPage = new AccountsViewModel(accounts, notifications);
-        var settings = new SettingsViewModel(notifications);
+        var settings = new SettingsViewModel(notifications, pickFolder);
 
         var downloadsItem = new NavItemViewModel(this, "DownloadIcon", "Downloads", downloadsPage);
         _downloadsItem = downloadsItem;

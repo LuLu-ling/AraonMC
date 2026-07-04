@@ -1,17 +1,23 @@
+using System;
+using System.IO;
 using System.Threading.Tasks;
 using AraonMC.Core.Application.Notifications;
+using AraonMC.Core.Config;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CoreConfig = AraonMC.Core.Config.Config;
 
 namespace AraonMC.ViewModels.Pages;
 
 public partial class SettingsViewModel : PageViewModelBase
 {
     private readonly INotificationService _notifications;
+    private readonly Func<Task<string?>> _pickFolder;
 
-    public SettingsViewModel(INotificationService notifications)
+    public SettingsViewModel(INotificationService notifications, Func<Task<string?>> pickFolder)
     {
         _notifications = notifications;
+        _pickFolder = pickFolder;
         Title = "Settings";
     }
 
@@ -30,7 +36,26 @@ public partial class SettingsViewModel : PageViewModelBase
     [ObservableProperty] private double _minMemoryMb = 512;
 
     // Game
-    [ObservableProperty] private string _gameDirectory = @"%APPDATA%\.araonmc";
+    /// <summary>读写穿透到 <c>Config.Game.GameDirectory</c>；空表示用默认 AppData 路径。</summary>
+    public string GameDirectory
+    {
+        get => CoreConfig.Game.GameDirectory;
+        set
+        {
+            CoreConfig.Game.GameDirectory = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string GameDirectoryDefault => Path.Combine(ConfigPaths.GlobalRoot(), ".minecraft");
+
+    [RelayCommand]
+    private async Task BrowseGameDirectoryAsync()
+    {
+        var picked = await _pickFolder();
+        if (picked is not null) GameDirectory = picked;
+    }
+
     [ObservableProperty] private double _windowWidth = 1280;
     [ObservableProperty] private double _windowHeight = 720;
     [ObservableProperty] private bool _fullscreen = false;
