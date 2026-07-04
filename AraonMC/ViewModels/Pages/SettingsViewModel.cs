@@ -36,7 +36,7 @@ public partial class SettingsViewModel : PageViewModelBase
     [ObservableProperty] private double _minMemoryMb = 512;
 
     // Game
-    /// <summary>读写穿透到 <c>Config.Game.GameDirectory</c>；空表示用默认 AppData 路径。</summary>
+    /// <summary>读写穿透到 <c>Config.Game.GameDirectory</c>；空表示用系统标准 .minecraft 路径。</summary>
     public string GameDirectory
     {
         get => CoreConfig.Game.GameDirectory;
@@ -47,7 +47,7 @@ public partial class SettingsViewModel : PageViewModelBase
         }
     }
 
-    public string GameDirectoryDefault => Path.Combine(ConfigPaths.GlobalRoot(), ".minecraft");
+    public string GameDirectoryDefault => ConfigPaths.DefaultGameDirectory();
 
     [RelayCommand]
     private async Task BrowseGameDirectoryAsync()

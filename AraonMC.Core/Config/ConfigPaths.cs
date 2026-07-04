@@ -40,12 +40,33 @@ public static class ConfigPaths
     public static string InstancesConfigFile() => Path.Combine(GlobalRoot(), "instances.toml");
 
     /// <summary>
-    /// 游戏根目录（.minecraft）：取 config 配置值，为空时默认 <c>&lt;GlobalRoot&gt;/.minecraft</c>
-    /// （Windows 上即 <c>%APPDATA%\AraonMC\.minecraft</c>）。
+    /// Minecraft 游戏目录（.minecraft）的系统标准位置（与官方启动器一致）：
+    /// <list type="bullet">
+    /// <item>Windows: <c>%APPDATA%\.minecraft</c></item>
+    /// <item>macOS: <c>~/Library/Application Support/minecraft</c></item>
+    /// <item>Linux: <c>~/.minecraft</c></item>
+    /// </list>
+    /// </summary>
+    public static string DefaultGameDirectory()
+    {
+        if (OperatingSystem.IsWindows())
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".minecraft");
+
+        if (OperatingSystem.IsMacOS())
+            return Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                "Library", "Application Support", "minecraft");
+
+        // Linux and other Unix-likes
+        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".minecraft");
+    }
+
+    /// <summary>
+    /// 游戏根目录：取 config 配置值，为空时回退到 <see cref="DefaultGameDirectory"/>（系统标准位置）。
     /// </summary>
     public static string GameDirectory()
     {
         var dir = Config.Game.GameDirectory;
-        return !string.IsNullOrWhiteSpace(dir) ? dir : Path.Combine(GlobalRoot(), ".minecraft");
+        return !string.IsNullOrWhiteSpace(dir) ? dir : DefaultGameDirectory();
     }
 }
