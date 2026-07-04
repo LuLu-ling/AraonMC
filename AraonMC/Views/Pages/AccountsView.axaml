@@ -61,7 +61,7 @@
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Path Width="14" Height="14" Stretch="Uniform"
                           Fill="{DynamicResource AccentForegroundBrush}" Stroke="Transparent"
-                          Data="{StaticResource ExternalIcon}"/>
+                          Data="{StaticResource external-link}"/>
                     <TextBlock Text="Add Microsoft" FontWeight="SemiBold" VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>

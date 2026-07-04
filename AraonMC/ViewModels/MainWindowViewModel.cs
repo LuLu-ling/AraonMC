@@ -38,17 +38,17 @@ public partial class MainWindowViewModel : ViewModelBase
         var accountsPage = new AccountsViewModel(accounts, notifications);
         var settings = new SettingsViewModel(notifications, pickFolder);
 
-        var downloadsItem = new NavItemViewModel(this, "DownloadIcon", "Downloads", downloadsPage);
+        var downloadsItem = new NavItemViewModel(this, "download", "Downloads", downloadsPage);
         _downloadsItem = downloadsItem;
 
         NavItems =
         [
-            new NavItemViewModel(this, "HomeIcon", "Home", home),
-            new NavItemViewModel(this, "BoxIcon", "Instances", instancesPage),
+            new NavItemViewModel(this, "house", "Home", home),
+            new NavItemViewModel(this, "package", "Instances", instancesPage),
             downloadsItem,
-            new NavItemViewModel(this, "PuzzleIcon", "Mods", modsPage),
-            new NavItemViewModel(this, "PersonIcon", "Accounts", accountsPage),
-            new NavItemViewModel(this, "GearIcon", "Settings", settings),
+            new NavItemViewModel(this, "puzzle", "Mods", modsPage),
+            new NavItemViewModel(this, "user", "Accounts", accountsPage),
+            new NavItemViewModel(this, "settings", "Settings", settings),
         ];
 
         // Share the service-owned live list so account add/remove stays in sync with this switcher.

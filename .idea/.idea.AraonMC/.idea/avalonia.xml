@@ -4,6 +4,7 @@
     <option name="projectPerEditor">
       <map>
         <entry key="AraonMC/App.axaml" value="AraonMC/AraonMC.csproj" />
+        <entry key="AraonMC/Styles/Icons.axaml" value="AraonMC/AraonMC.csproj" />
         <entry key="AraonMC/Views/MainWindow.axaml" value="AraonMC/AraonMC.csproj" />
         <entry key="AraonMC/Views/Pages/SettingsView.axaml" value="AraonMC/AraonMC.csproj" />
       </map>

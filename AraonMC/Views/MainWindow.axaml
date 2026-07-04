@@ -90,13 +90,13 @@
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
                     <Button Classes="chrome" Click="Minimize_Click" ToolTip.Tip="Minimize">
-                        <Path Data="{StaticResource MinimizeIcon}"/>
+                        <Path Data="{StaticResource minus}"/>
                     </Button>
                     <Button Classes="chrome" Click="Maximize_Click" ToolTip.Tip="Maximize">
-                        <Path Data="{StaticResource MaximizeIcon}"/>
+                        <Path Data="{StaticResource square}"/>
                     </Button>
                     <Button Classes="chrome" x:Name="closeBtn" Click="Close_Click" ToolTip.Tip="Close">
-                        <Path Data="{StaticResource CloseIcon}"/>
+                        <Path Data="{StaticResource x}"/>
                     </Button>
                 </StackPanel>
             </Grid>
@@ -142,7 +142,7 @@
                                         </StackPanel>
                                         <Path Grid.Column="2" Width="14" Height="14" Stretch="Uniform"
                                               Fill="Transparent" Stroke="{DynamicResource TextMutedBrush}" StrokeThickness="1.5"
-                                              Data="{StaticResource ChevronDownIcon}" VerticalAlignment="Center"/>
+                                              Data="{StaticResource chevron-down}" VerticalAlignment="Center"/>
                                     </Grid>
                                 </Border>
                             </Button>

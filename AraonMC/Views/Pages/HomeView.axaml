@@ -111,7 +111,7 @@
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <Path Width="16" Height="16" Stretch="Uniform"
                                   Fill="{DynamicResource AccentForegroundBrush}" Stroke="Transparent"
-                                  Data="{StaticResource PlayIcon}"/>
+                                  Data="{StaticResource play}"/>
                             <TextBlock Text="PLAY" FontSize="15" FontWeight="Bold" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>

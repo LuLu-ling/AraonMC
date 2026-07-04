@@ -16,6 +16,7 @@ using AraonMC.Downloads;
 using AraonMC.Instances;
 using AraonMC.Launching;
 using AraonMC.Notifications;
+using AraonMC.Styles;
 using AraonMC.ViewModels;
 using AraonMC.Views;
 using MinecraftDownloader.Core.Manifest;
@@ -32,6 +33,14 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        // Lucide 图标（Assets/Icons/lucide/*.svg）→ Geometry 资源，按 slug 注册。
+        var n = 0;
+        foreach (var (slug, geom) in LucideIconLoader.Load())
+        {
+            Resources[slug] = geom;
+            n++;
+        }
+        DebugLog.Info($"Icons: loaded {n} lucide icon(s) from Assets/Icons/lucide.");
     }
 
     public override void OnFrameworkInitializationCompleted()
