@@ -72,7 +72,7 @@ public partial class App : Application
 
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(accounts, instances, versions, installer, mods, launcher, notifications, downloads),
+                DataContext = new MainWindowViewModel(accounts, instances, versions, downloads, mods, launcher, notifications),
             };
         }
 
