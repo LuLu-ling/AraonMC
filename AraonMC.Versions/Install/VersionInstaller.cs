@@ -23,7 +23,7 @@ public sealed class VersionInstaller
         _versions = versions;
         _mirror = mirror;
         _http = http;
-        _downloader = new FileDownloader(http);
+        _downloader = new FileDownloader(new DownloaderEngine());
     }
 
     public async Task InstallAsync(
@@ -42,7 +42,7 @@ public sealed class VersionInstaller
         // client.json（小文件，直下并解析）
         var clientJsonPath = Path.Combine(versionDir, versionId + ".json");
         await DownloadTextAsync(MirrorUrls.Rewrite(_mirror, entry.Url), clientJsonPath, ct);
-        progress?.Report(new InstallProgress(InstallPhase.ClientJson, 1, 1, versionId + ".json"));
+        progress?.Report(new InstallProgress(InstallPhase.ClientJson, 1, 1, 1, 1, 0, versionId + ".json"));
 
         var meta = VersionMetadataReader.Read(await File.ReadAllTextAsync(clientJsonPath, ct));
         var librariesRoot = Path.Combine(instanceDir, "libraries");
@@ -87,13 +87,14 @@ public sealed class VersionInstaller
                     Url = MirrorUrls.AssetUrl(_mirror, obj.Hash),
                     TargetPath = Path.Combine(objectsDir, obj.Hash[..2], obj.Hash),
                     Sha1 = obj.Hash,
+                    Size = obj.Size == 0 ? null : obj.Size,
                 });
             }
             await _downloader.DownloadAllAsync(assetReqs, InstallPhase.Assets, progress, ct);
         }
 
         // 解压 natives
-        progress?.Report(new InstallProgress(InstallPhase.Natives, 0, 0, null));
+        progress?.Report(new InstallProgress(InstallPhase.Natives, 0, 0, 0, 0, 0, null));
         ExtractNatives(resolved, librariesRoot, Path.Combine(instanceDir, "natives-" + versionId));
     }
 
@@ -109,6 +110,7 @@ public sealed class VersionInstaller
         Url = MirrorUrls.Rewrite(_mirror, ToUri(art.Url)),
         TargetPath = targetPath,
         Sha1 = string.IsNullOrEmpty(art.Sha1) ? null : art.Sha1,
+        Size = art.Size == 0 ? null : art.Size,
     };
 
     private async Task DownloadTextAsync(Uri url, string path, CancellationToken ct)

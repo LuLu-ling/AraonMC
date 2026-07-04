@@ -10,19 +10,23 @@ public sealed class DownloadRequest
 
     /// <summary>期望的 sha1；提供时用于校验与"已存在则跳过"判定。</summary>
     public string? Sha1 { get; init; }
+
+    /// <summary>文件大小（字节）；用于汇总总进度。未知则留 null。</summary>
+    public long? Size { get; init; }
 }
 
 /// <summary>
-/// 并发文件下载器：sha1 校验、原子写入（.tmp → move）、已存在且校验通过则跳过。
+/// 并发文件下载编排器：跨文件并行（默认 8）+ 每文件委托 <see cref="IDownloadEngine"/> 传输；
+/// sha1 校验、原子写入（.tmp → move）、已存在且校验通过则跳过；聚合字节级进度。
 /// </summary>
 public sealed class FileDownloader
 {
-    private readonly HttpClient _http;
+    private readonly IDownloadEngine _engine;
     private readonly int _maxConcurrency;
 
-    public FileDownloader(HttpClient http, int maxConcurrency = 8)
+    public FileDownloader(IDownloadEngine engine, int maxConcurrency = 8)
     {
-        _http = http;
+        _engine = engine;
         _maxConcurrency = maxConcurrency;
     }
 
@@ -32,38 +36,71 @@ public sealed class FileDownloader
         IProgress<InstallProgress>? progress,
         CancellationToken ct = default)
     {
-        var done = 0;
-        var total = requests.Count;
-        await Parallel.ForEachAsync(
-            requests,
-            new ParallelOptions { MaxDegreeOfParallelism = _maxConcurrency, CancellationToken = ct },
-            async (req, token) =>
+        var totalFiles = requests.Count;
+        var totalBytes = requests.Sum(r => r.Size ?? 0);
+        var received = new long[totalFiles];
+        var speed = new long[totalFiles];
+        var filesDone = 0;
+        var lastReport = 0L;
+
+        void Report(string? currentFile, bool force)
+        {
+            var now = Environment.TickCount64;
+            if (!force && now - lastReport < 100) return;
+            lastReport = now;
+
+            var recv = 0L;
+            for (var i = 0; i < received.Length; i++) recv += received[i];
+            var sp = 0L;
+            for (var i = 0; i < speed.Length; i++) sp += speed[i];
+
+            progress?.Report(new InstallProgress(phase, recv, totalBytes, filesDone, totalFiles, sp, currentFile));
+        }
+
+        async Task DownloadOneAsync(DownloadRequest req, int idx, CancellationToken token)
+        {
+            var dir = Path.GetDirectoryName(req.TargetPath);
+            if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+
+            if (req.Sha1 is not null && File.Exists(req.TargetPath) && Sha1Matches(req.TargetPath, req.Sha1))
             {
-                await DownloadOneAsync(req, token).ConfigureAwait(false);
-                var d = Interlocked.Increment(ref done);
-                progress?.Report(new InstallProgress(phase, d, total, Path.GetFileName(req.TargetPath)));
+                received[idx] = req.Size ?? 0;
+                return;
+            }
+
+            var tmp = req.TargetPath + ".tmp";
+            if (File.Exists(tmp)) File.Delete(tmp);
+
+            IProgress<EngineProgress>? perFile = progress is null ? null
+                : new Progress<EngineProgress>(p =>
+                {
+                    received[idx] = p.ReceivedBytes;
+                    speed[idx] = (long)p.BytesPerSecond;
+                    Report(Path.GetFileName(req.TargetPath), force: false);
+                });
+
+            await _engine.DownloadAsync(req.Url, tmp, perFile, token).ConfigureAwait(false);
+            token.ThrowIfCancellationRequested();
+
+            if (req.Sha1 is not null && !Sha1Matches(tmp, req.Sha1))
+                throw new InstallException($"sha1 mismatch for {req.Url}", req.Url, req.TargetPath);
+
+            File.Move(tmp, req.TargetPath, overwrite: true);
+            if (req.Size is { } sz) received[idx] = sz;
+        }
+
+        var indexed = requests.Select((r, i) => (req: r, idx: i)).ToArray();
+        await Parallel.ForEachAsync(
+            indexed,
+            new ParallelOptions { MaxDegreeOfParallelism = _maxConcurrency, CancellationToken = ct },
+            async (item, token) =>
+            {
+                await DownloadOneAsync(item.req, item.idx, token).ConfigureAwait(false);
+                Interlocked.Increment(ref filesDone);
+                Report(Path.GetFileName(item.req.TargetPath), force: false);
             }).ConfigureAwait(false);
-    }
 
-    private async Task DownloadOneAsync(DownloadRequest req, CancellationToken ct)
-    {
-        var dir = Path.GetDirectoryName(req.TargetPath);
-        if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
-
-        if (req.Sha1 is not null && File.Exists(req.TargetPath) && Sha1Matches(req.TargetPath, req.Sha1))
-            return;
-
-        var tmp = req.TargetPath + ".tmp";
-        using var resp = await _http.GetAsync(req.Url, HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false);
-        resp.EnsureSuccessStatusCode();
-
-        await using (var fs = File.Create(tmp))
-            await resp.Content.CopyToAsync(fs, ct).ConfigureAwait(false);
-
-        if (req.Sha1 is not null && !Sha1Matches(tmp, req.Sha1))
-            throw new InstallException($"sha1 mismatch for {req.Url}", req.Url, req.TargetPath);
-
-        File.Move(tmp, req.TargetPath, overwrite: true);
+        Report(null, force: true);
     }
 
     private static bool Sha1Matches(string path, string expected)

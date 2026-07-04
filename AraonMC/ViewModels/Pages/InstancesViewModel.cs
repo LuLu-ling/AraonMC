@@ -88,7 +88,7 @@ public partial class InstancesViewModel : PageViewModelBase
             await _notifications.ShowAsync(NotificationRequest.Toast(
                 "Downloading", $"Installing Minecraft {instance.MinecraftVersion}…", NotificationLevel.Info));
             var progress = new Progress<InstallProgress>(p =>
-                DebugLog.Info($"install {instance.MinecraftVersion}: {p.Phase} {p.Done}/{p.Total} {p.CurrentFile}"));
+                DebugLog.Info($"install {instance.MinecraftVersion}: {p.Phase} {p.FilesDone}/{p.FilesTotal} {p.CurrentFile}"));
             await _installer.InstallAsync(instance.MinecraftVersion, instance.Path, progress);
             await _notifications.ShowAsync(NotificationRequest.Toast(
                 "Download complete", $"{instance.Name} is ready to play.", NotificationLevel.Success));
