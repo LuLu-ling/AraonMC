@@ -7,11 +7,15 @@ using AraonMC.LaunchArgs.Version;
 namespace AraonMC.Downloads;
 
 /// <summary>
-///   上游 <c>MinecraftDownloader.Core</c> 只下载每个库的 <c>artifact</c>，不下载也不解压
-///   native 库（classifiers）。这里在 install 完成后补一步：按当前平台选出 native 制品，
-///   下载到 libraries/&lt;path&gt;，再解压到 <c>natives-&lt;versionId&gt;</c>，供启动器
-///   挂为 <c>-Djava.library.path</c>。选库逻辑复用 <see cref="ClasspathResolver"/>，
-///   保证"装哪些 native"与"启动用哪些"一致。
+///   上游 <c>MinecraftDownloader.Core</c> 只下载每个库的 <c>artifact</c>，不下载也不处理
+///   native 库（classifiers）。这里补齐 native 侧，分两段：
+///   <list type="bullet">
+///     <item><see cref="EnsureDownloadedAsync"/>（安装期）：把 native classifier jar 下到 <c>libraries/</c>，常驻。</item>
+///     <item><see cref="ExtractTo"/>（启动期）：把已下载的 native jar 解压到调用方给的临时目录，
+///       供 <c>-Djava.library.path</c> 指向。现代 MC（LWJGL 3）约定 natives 是启动期临时产物，
+///       不常驻 <c>.minecraft</c>——故不再放 <c>versions/&lt;id&gt;/&lt;id&gt;-natives</c>。</item>
+///   </list>
+///   选库逻辑复用 <see cref="ClasspathResolver"/>，保证“装哪些/解压哪些 native”与启动用的一致。
 /// </summary>
 public sealed class NativeLibraryExtractor
 {
@@ -19,31 +23,47 @@ public sealed class NativeLibraryExtractor
 
     public NativeLibraryExtractor(HttpClient http) => _http = http;
 
-    public async Task ExtractAsync(string gameDir, string versionId, CancellationToken ct = default)
+    /// <summary>安装期：把当前平台所需的 native classifier jar 下到 <c>libraries/&lt;path&gt;</c>（已存在且校验通过则跳过）。</summary>
+    public async Task EnsureDownloadedAsync(string gameDir, string versionId, CancellationToken ct = default)
     {
-        var versionJsonPath = Path.Combine(gameDir, "versions", versionId, versionId + ".json");
-        var json = await File.ReadAllTextAsync(versionJsonPath, ct).ConfigureAwait(false);
-        var meta = VersionMetadataReader.Read(json);
-
-        var resolved = new ClasspathResolver(new RuleEvaluator()).Resolve(meta.Libraries, new HashSet<string>());
         var librariesRoot = Path.Combine(gameDir, "libraries");
-        var versionDir = Path.Combine(gameDir, "versions", versionId);
-        // 真实 .minecraft 布局：natives 在版本目录内（versions/<id>/<id>-natives），
-        // 也是启动时 -Djava.library.path 指向的位置。须与 MinecraftGameLauncher 一致。
-        var nativesDir = Path.Combine(versionDir, versionId + "-natives");
-
-        if (Directory.Exists(nativesDir)) Directory.Delete(nativesDir, recursive: true);
-        Directory.CreateDirectory(nativesDir);
-
-        foreach (var r in resolved)
+        foreach (var (native, _) in ResolveNativeLibs(gameDir, versionId))
         {
-            if (r.Native is not { } native) continue;
             if (string.IsNullOrEmpty(native.Url) || string.IsNullOrEmpty(native.Path)) continue;
-
-            var nativePath = Path.Combine(librariesRoot, native.Path);
-            await DownloadIfMissingAsync(native.Url, nativePath, native.Sha1, ct).ConfigureAwait(false);
-            ExtractNative(nativePath, nativesDir, r.Library.Extract?.Exclude);
+            await DownloadIfMissingAsync(native.Url, Path.Combine(librariesRoot, native.Path), native.Sha1, ct)
+                .ConfigureAwait(false);
         }
+    }
+
+    /// <summary>启动期：把 native jar 解压到 <paramref name="targetDir"/>（先清空重建），按 extract.exclude 跳过排除项。</summary>
+    public void ExtractTo(string gameDir, string versionId, string targetDir)
+    {
+        var librariesRoot = Path.Combine(gameDir, "libraries");
+
+        if (Directory.Exists(targetDir)) Directory.Delete(targetDir, recursive: true);
+        Directory.CreateDirectory(targetDir);
+
+        foreach (var (native, lib) in ResolveNativeLibs(gameDir, versionId))
+        {
+            var jarPath = Path.Combine(librariesRoot, native.Path);
+            if (!File.Exists(jarPath)) continue;
+            ExtractNative(jarPath, targetDir, lib.Extract?.Exclude);
+        }
+    }
+
+    // ---- helpers ----
+
+    private static List<(VersionArtifact Native, VersionLibrary Lib)> ResolveNativeLibs(string gameDir, string versionId)
+    {
+        var jsonPath = Path.Combine(gameDir, "versions", versionId, versionId + ".json");
+        var meta = VersionMetadataReader.Read(File.ReadAllText(jsonPath));
+        var resolved = new ClasspathResolver(new RuleEvaluator()).Resolve(meta.Libraries, new HashSet<string>());
+
+        var list = new List<(VersionArtifact, VersionLibrary)>(capacity: 8);
+        foreach (var r in resolved)
+            if (r.Native is { } native && !string.IsNullOrEmpty(native.Path))
+                list.Add((native, r.Library));
+        return list;
     }
 
     private async Task DownloadIfMissingAsync(string url, string dest, string expectedSha1, CancellationToken ct)

@@ -85,8 +85,8 @@ public sealed class DownloadManager : IDownloadManager
                 return;
             }
 
-            // 上游不下载/解压 native 库，这里补齐。
-            await _natives.ExtractAsync(job.InstancePath, job.VersionId, job.Cts.Token);
+            // 上游不下 native 库，安装期补下到 libraries/；解压留到启动期（见 MinecraftGameLauncher）。
+            await _natives.EnsureDownloadedAsync(job.InstancePath, job.VersionId, job.Cts.Token);
 
             job.Status = DownloadStatus.Completed;
             job.ProgressPercent = 100;

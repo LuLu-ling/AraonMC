@@ -68,7 +68,7 @@ public partial class App : Application
 
             var instances = new JsonInstanceRepository(notifications);
             var mods = new StubModRepository();
-            var launcher = new MinecraftGameLauncher(accounts, notifications);
+            var launcher = new MinecraftGameLauncher(accounts, natives, notifications);
             var downloads = new DownloadManager(installer, natives, notifications);
 
             var window = new MainWindow();

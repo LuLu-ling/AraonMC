@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using AraonMC.Core.Application.Notifications;
 using AraonMC.Core.Application.Ports;
 using AraonMC.Core.Domain.Entities;
+using AraonMC.Downloads;
 using AraonMC.LaunchArgs;
 using AraonMC.LaunchArgs.Version;
 // Alias: the app's Config/ folder exposes namespace AraonMC.Config, which would shadow the
@@ -21,11 +22,16 @@ namespace AraonMC.Launching;
 public sealed class MinecraftGameLauncher : IGameLauncher
 {
     private readonly IAccountService _accounts;
+    private readonly NativeLibraryExtractor _natives;
     private readonly INotificationService _notifications;
 
-    public MinecraftGameLauncher(IAccountService accounts, INotificationService notifications)
+    public MinecraftGameLauncher(
+        IAccountService accounts,
+        NativeLibraryExtractor natives,
+        INotificationService notifications)
     {
         _accounts = accounts;
+        _natives = natives;
         _notifications = notifications;
     }
 
@@ -78,6 +84,11 @@ public sealed class MinecraftGameLauncher : IGameLauncher
             var json = await File.ReadAllTextAsync(versionJsonPath, ct);
             var meta = VersionMetadataReader.Read(json);
 
+            // 现代 MC（LWJGL 3）约定：natives 是启动期临时产物，解压到系统临时目录，
+            // 每次启动重建，不常驻 .minecraft。安装期已把 native jar 下到 libraries/。
+            var nativesDir = Path.Combine(Path.GetTempPath(), "AraonMC", "natives", instance.Id);
+            await Task.Run(() => _natives.ExtractTo(instance.Path, versionId, nativesDir), ct);
+
             // 用户自定义 JVM 参数；剔除 -Xmx/-Xms，避免与下方按内存字段注入的冲突。
             var extraJvm = (CoreConfig.Java.Arguments ?? string.Empty)
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
@@ -93,7 +104,7 @@ public sealed class MinecraftGameLauncher : IGameLauncher
                 AccountKind = account.IsOnline ? AccountKind.Online : AccountKind.Offline,
                 GameDirectory = instance.Path,
                 VersionId = versionId,
-                NativesDirectory = Path.Combine(versionDir, versionId + "-natives"),
+                NativesDirectory = nativesDir,
                 LibrariesDirectory = Path.Combine(instance.Path, "libraries"),
                 AssetsRoot = Path.Combine(instance.Path, "assets"),
                 ClientJarPath = Path.Combine(versionDir, versionId + ".jar"),
