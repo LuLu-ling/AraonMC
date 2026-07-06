@@ -1,3 +1,5 @@
+using AraonMC.Core.Config;
+using AraonMC.UI.Theme;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -109,6 +111,8 @@ public class ComboBox : TemplatedControl
             if (_topLevel is Window w)
                 w.Deactivated += OnWindowDeactivated;
         }
+        ThemeService.ColorModeChanged += OnThemeChanged;
+        ThemeService.ColorThemeChanged += OnThemeChanged;
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -125,6 +129,8 @@ public class ComboBox : TemplatedControl
                 w.Deactivated -= OnWindowDeactivated;
             _topLevel = null;
         }
+        ThemeService.ColorModeChanged -= OnThemeChanged;
+        ThemeService.ColorThemeChanged -= OnThemeChanged;
     }
 
     private void OnWindowDeactivated(object? sender, EventArgs e)
@@ -241,6 +247,9 @@ public class ComboBox : TemplatedControl
             UpdateSelectedText();
     }
 
+    private void OnThemeChanged(bool isDarkMode, ColorTheme theme) => UpdateSelectedText();
+    private void OnThemeChanged(ColorTheme theme) => UpdateSelectedText();
+
     private void UpdateSelectedText()
     {
         if (_selectedText == null) return;
@@ -252,14 +261,14 @@ public class ComboBox : TemplatedControl
             _selectedText.Text = text ?? PlaceholderText;
             _selectedText.FontWeight = FontWeight.SemiBold;
             _selectedText.Opacity = 1;
-            _selectedText.Foreground = Application.Current?.FindResource("TextPrimaryBrush") as IBrush;
+            _selectedText.Foreground = Application.Current?.FindResource("ColorBrushGray1") as IBrush;
         }
         else
         {
             _selectedText.Text = PlaceholderText;
             _selectedText.FontWeight = FontWeight.Medium;
             _selectedText.Opacity = 0.7;
-            _selectedText.Foreground = Application.Current?.FindResource("TextSecondaryBrush") as IBrush;
+            _selectedText.Foreground = Application.Current?.FindResource("ColorBrushGray2") as IBrush;
         }
     }
 
