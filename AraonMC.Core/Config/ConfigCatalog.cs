@@ -39,9 +39,9 @@ public partial class Config
     [Section(Scope = ConfigScope.Global, Path = "theme")]
     public sealed partial class ThemeSection
     {
-        [Key(Default = ColorMode.Dark)]    public partial ColorMode   ColorMode  { get; set; }
+        [Key(Default = ColorMode.Dark)] public partial ColorMode ColorMode  { get; set; }
         [Key(Default = ColorTheme.SkyBlue)] public partial ColorTheme DarkColor  { get; set; }
-        [Key(Default = ColorTheme.Amber)]  public partial ColorTheme LightColor { get; set; }
+        [Key(Default = ColorTheme.Amber)] public partial ColorTheme LightColor { get; set; }
     }
 
     /// <summary>
